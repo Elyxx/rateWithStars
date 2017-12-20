@@ -22,10 +22,6 @@ class Rating: UIView {
     
     var starSize: CGFloat = 0
     
-    var leadingPoint: CGPoint = CGPoint()
-    var tralingPoint: CGPoint = CGPoint()
-    var ratingRule: CGFloat = 0
-   
     init (x: Double, y: Double, height: Double, currentRate: Double) {
         let frame = CGRect(x: x, y: y, width: height * 5, height: height)
         super.init(frame: frame)
@@ -50,26 +46,22 @@ class Rating: UIView {
         //let smallBeam = radius*CGFloat((sin(18*Double.pi/180)/sin(126*Double.pi/180))) //classic star
         let smallBeam = radius/2 // for fat stars
         var split = CGFloat(rating)
-        
         for _ in 1...5 {
             setStarPointsArray(centralPoint: center, longBeam: radius, shortBeam: smallBeam)
-            if split > 0 && split < 1{
+            if split <= 0 {
+                drawStar(context: context, points: starPoints, color: secondColor)
+            } else if split < 1 {
                 setFilledHalfArray(split)
                 if split < 0.5 {
                     drawStar(context: context, points: starPoints, color: firstColor)
                     drawStar(context: context, points: emptyHalf, color: secondColor)
-                    print("0-0.5")
                 }
                 else {
                     drawStar(context: context, points: starPoints, color: secondColor)
                     drawStar(context: context, points: filledHalf, color: firstColor)
                 }
-            }
-            if split <= 0 {
-                drawStar(context: context, points: starPoints, color: secondColor)
-            }
-            if split >= 1 {
-                drawStar(context: context, points: starPoints, color: firstColor)
+            } else {
+                    drawStar(context: context, points: starPoints, color: firstColor)
             }
             center.x += starSize
             split -= 1
@@ -97,8 +89,6 @@ class Rating: UIView {
             if  ( starPoints[currentIndex].x >= splitPoint.x && starPoints[currentIndex - 1].x < splitPoint.x ) ||
                 ( starPoints[currentIndex].x < splitPoint.x && starPoints[currentIndex - 1].x >= splitPoint.x ) {
                 splitPoint.y = ( ( splitPoint.x - starPoints[currentIndex - 1].x) / (starPoints[currentIndex].x - starPoints[currentIndex - 1].x) ) * (starPoints[currentIndex].y - starPoints[currentIndex - 1].y) + starPoints[currentIndex - 1].y
-                print(starPoints[currentIndex].x)
-                print(split)
                 filledHalf.append(splitPoint)
                 emptyHalf.append(splitPoint)
             }
@@ -108,13 +98,8 @@ class Rating: UIView {
             }
             if ( starPoints[currentIndex].x > splitPoint.x ) {
                 emptyHalf.append(starPoints[currentIndex])
-                
             }
         }
-    }
-    
-    func calculateSplitY () {
-        // = ( ( splitPoint.x - starPoints[currentIndex - 1].x) / (starPoints[currentIndex].x - starPoints[currentIndex - 1].x) ) * (starPoints[currentIndex].y - starPoints[currentIndex - 1].y) + starPoints[currentIndex - 1].y
     }
     
     func setStarPointsArray(centralPoint: CGPoint, longBeam: CGFloat, shortBeam: CGFloat) {
@@ -125,6 +110,11 @@ class Rating: UIView {
         }
         starPoints.append(createPoint(angle: angles[10], centralPoint: centralPoint, beam: longBeam))
     }
+    
+    func calculateSplitY () {
+        // = ( ( splitPoint.x - starPoints[currentIndex - 1].x) / (starPoints[currentIndex].x - starPoints[currentIndex - 1].x) ) * (starPoints[currentIndex].y - starPoints[currentIndex - 1].y) + starPoints[currentIndex - 1].y
+    }
+    
 }
 /*
  func offsetX(coordinate: Double) ->CGFloat {
